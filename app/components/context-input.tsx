@@ -17,7 +17,7 @@ const ContextInput = () => {
   return (
     <div className="h-full flex flex-col gap-4">
       <Textarea
-        className="resize-none h-full"
+        className="resize-none h-full focus:outline-none focus:ring-2 focus:ring-red-500"
         value={context}
         onChange={(e) => setContext(e.target.value)}
         placeholder="Enter context here..."
@@ -33,7 +33,7 @@ const ContextInput = () => {
               className="cursor-pointer flex gap-2 bg-slate-700 items-center"
               onClick={fileUploadHandler}
             >
-              <FileText className="mr-2" />
+              <FileText className="mr-1" />
               <span>Upload document</span>
             </Button>
             <input
@@ -49,7 +49,7 @@ const ContextInput = () => {
               className="cursor-pointer flex gap-2 bg-slate-700 items-center"
               onClick={fileUploadHandler}
             >
-              <Link className="mr-2" />
+              <Link className="mr-1" />
               <span>Upload link</span>
             </Button>
             <input
@@ -65,7 +65,7 @@ const ContextInput = () => {
 
       <Button
         type="submit"
-        className="text-lg font-family-roboto py-6 bg-blue-500 "
+        className="font-family-roboto py-4 bg-blue-500 "
       >
         Submit
       </Button>

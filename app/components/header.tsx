@@ -1,7 +1,7 @@
 const Header = () => {
   return (
-    <header className="border py-8">
-      <h1 className="font-family-sans text-5xl font-bold">Askify</h1>
+    <header className="border py-4">
+      <h1 className="font-family-roboto text-3xl font-bold">Askify</h1>
     </header>
   );
 };
