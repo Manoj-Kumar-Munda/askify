@@ -2,17 +2,57 @@
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FileText, Link } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const ContextInput = () => {
-  const [context, setContext] = useState("");
+  const [context, setContext] = useState<string>("");
+  const [file, setFile] = useState<File | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fileUploadHandler = () => {
     fileInputRef.current?.click();
   };
+
+  const fileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setFile(files[0]);
+    }
+  };
+
+  const uploadFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("/api/context/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    console.log(response);
+    
+
+    if (!response.ok) {
+      throw new Error("File upload failed");
+    }
+
+    return response.json();
+  };
+
+  useEffect(() => {
+    if (file) {
+      uploadFile(file)
+        .then((data) => {
+          console.log("File uploaded successfully:", data);
+        })
+        .catch((error) => {
+          console.error("Error uploading file:", error);
+        });
+    }
+  }, [file]);
 
   return (
     <div className="h-full flex flex-col gap-4">
@@ -40,7 +80,7 @@ const ContextInput = () => {
               ref={fileInputRef}
               type="file"
               accept=".pdf,.docx,.txt,.csv"
-              placeholder="Enter URL or document name"
+              placeholder="Pick a document"
               className="hidden"
             />
           </div>
@@ -52,21 +92,19 @@ const ContextInput = () => {
               <Link className="mr-1" />
               <span>Upload link</span>
             </Button>
-            <input
+            <Input
               ref={fileInputRef}
               type="file"
               accept=".pdf,.docx,.txt,.csv"
               placeholder="Enter URL or document name"
               className="hidden"
+              onChange={fileChangeHandler}
             />
           </div>
         </div>
       </div>
 
-      <Button
-        type="submit"
-        className="font-family-roboto py-4 bg-blue-500 "
-      >
+      <Button type="submit" className="font-family-roboto py-4 bg-blue-500 ">
         Submit
       </Button>
     </div>
