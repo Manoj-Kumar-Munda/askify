@@ -21,7 +21,7 @@ const Output = () => {
   };
   return (
     <div className="h-full flex flex-col gap-2">
-      <div className="grow overflow-y-auto h-full">
+      <div className="grow overflow-y-auto h-full no-scrollbar">
         <h2 className="text-lg font-semibold">Output</h2>
         <p>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo amet
