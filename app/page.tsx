@@ -1,6 +1,6 @@
-import ContextInput from "./components/context-input";
-import Header from "./components/header";
-import Output from "./components/output";
+import ContextInput from "../components/context-input";
+import Header from "../components/header";
+import Output from "../components/output";
 
 export default function Home() {
   return (

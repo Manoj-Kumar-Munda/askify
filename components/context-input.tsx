@@ -57,7 +57,7 @@ const ContextInput = () => {
   return (
     <div className="h-full flex flex-col gap-4">
       <Textarea
-        className="resize-none h-full focus:outline-none focus:ring-2 focus:ring-red-500"
+        className="resize-none h-1/4 focus:outline-none focus:ring-2 focus:ring-red-500"
         value={context}
         onChange={(e) => setContext(e.target.value)}
         placeholder="Enter context here..."
@@ -104,7 +104,7 @@ const ContextInput = () => {
         </div>
       </div>
 
-      <Button type="submit" className="font-family-roboto py-4 bg-blue-500 ">
+      <Button type="submit" className="font-family-roboto py-4 bg-neutral-700 text-white">
         Submit
       </Button>
     </div>
