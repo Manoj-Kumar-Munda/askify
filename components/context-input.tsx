@@ -55,9 +55,9 @@ const ContextInput = () => {
   }, [file]);
 
   return (
-    <div className="h-full flex flex-col gap-4">
+    <div className="h-full flex flex-col gap-4 font-family-roboto">
       <Textarea
-        className="resize-none h-1/4 focus:outline-none focus:ring-2 focus:ring-red-500"
+        className="resize-none h-1/4 focus:outline-none"
         value={context}
         onChange={(e) => setContext(e.target.value)}
         placeholder="Enter context here..."
@@ -65,7 +65,7 @@ const ContextInput = () => {
 
       {/* add source - attach docs or website url */}
       <div>
-        <p>Add source</p>
+        <p className="">Add source</p>
 
         <div className="flex items-center gap-3">
           <div>

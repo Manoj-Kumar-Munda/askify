@@ -20,7 +20,7 @@ const Output = () => {
     }
   };
   return (
-    <div className="h-full flex flex-col gap-2">
+    <div className="h-full flex flex-col gap-2 pb-4">
       <div className="grow overflow-y-auto h-full no-scrollbar">
         <h2 className="text-lg font-semibold">Output</h2>
         <p>
@@ -85,16 +85,16 @@ const Output = () => {
         </p>
       </div>
 
-      <form className="flex gap-2 items-center border-t py-2">
+      <form className="flex gap-2 items-center border-2 focus-within:border-neutral-800 p-3 rounded-4xl">
         <Input
-          className="border-none outline-none focus-visible:ring-0"
+          className="border-none outline-none focus-visible:ring-0 outline-0 shadow-none"
           value={chatInput}
           onChange={(e) => setChatInput(e.target.value)}
           placeholder="Ask anything..."
           onKeyDown={keyDownHandler}
         />
-        <Button onClick={handleSend}>
-          <Send />
+        <Button className="shadow-none rounded-full size-10 text-white bg-transparent hover:bg-gray-200 transition-colors" onClick={handleSend}>
+          <Send className="text-neutral-800" size={64} />
         </Button>
       </form>
     </div>
