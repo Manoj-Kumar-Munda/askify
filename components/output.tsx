@@ -1,102 +1,114 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Send } from "lucide-react";
 import { useState } from "react";
+import {
+  PromptInput,
+  PromptInputSubmit,
+  PromptInputTextarea,
+  PromptInputToolbar,
+} from "./ai-elements/prompt-input";
+import { Conversation, ConversationContent } from "./ai-elements/conversation";
+import { Message, MessageContent } from "./ai-elements/message";
+import { Response } from "./ai-elements/response";
+
+interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+  status?: "sending" | "sent" | "error";
+}
 
 const Output = () => {
   const [chatInput, setChatInput] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  const handleSend = () => {
-    // Handle send message
+  const handleSend = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: "user",
+      content: chatInput,
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, userMessage]);
     setChatInput("");
-  };
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message: chatInput }),
+    });
 
-  const keyDownHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSend();
-      setChatInput("");
+    const reader = res.body?.getReader();
+    const decoder = new TextDecoder();
+    let fullResponse = "";
+
+    //assistant message placeholder
+    const assistantMessage: ChatMessage = {
+      id: (Date.now() + 1).toString(),
+      role: "assistant",
+      content: fullResponse,
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, assistantMessage]);
+
+    while (true) {
+      const { done, value } = (await reader?.read()) ?? {};
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+
+      const lines = chunk.split("\n");
+      for (const line of lines) {
+        if (line.startsWith("data: ")) {
+          const data = JSON.parse(line.slice(6));
+          fullResponse += data.content;
+
+          // Update the streaming message in real-time
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessage.id
+                ? { ...msg, content: fullResponse }
+                : msg
+            )
+          );
+        }
+      }
     }
   };
+
   return (
     <div className="h-full flex flex-col gap-2 pb-4">
-      <div className="grow overflow-y-auto h-full no-scrollbar">
-        <h2 className="text-lg font-semibold">Output</h2>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo amet
-          totam earum et architecto. Voluptas deserunt soluta quis veritatis
-          consequuntur! Ipsum ex similique id officia, nobis deleniti
-          architecto, nesciunt voluptate tempore voluptates voluptatem tenetur
-          veniam, consequatur rerum officiis modi magni rem ullam ad in? Beatae
-          delectus distinctio praesentium illo veritatis corporis omnis
-          sapiente, iure adipisci eligendi cupiditate est similique quo odit
-          doloribus eum, rem error fugiat incidunt quasi fugit minima? Quaerat
-          animi hic dolorem suscipit pariatur cum numquam eligendi ut, quo
-          architecto vero eum ipsum accusantium doloribus modi culpa! Similique
-          laboriosam vel quae consequuntur, atque doloremque porro sit excepturi
-          cumque cupiditate, adipisci aut voluptates officiis quos, et fugiat
-          placeat dolor distinctio quibusdam? Repellat doloremque ratione
-          exercitationem voluptatibus rem nihil quasi neque alias? Explicabo aut
-          est molestiae harum eum ea autem tempora a incidunt optio earum
-          placeat officia, debitis repellat fuga nemo perferendis veritatis
-          atque quasi nam ab sint. Nobis laboriosam deserunt consectetur
-          perferendis recusandae maiores quidem eos iusto aliquid nostrum saepe
-          ipsam natus error veniam, iste magni ea dolore reiciendis. Ratione
-          iure modi dolorum soluta vero voluptas explicabo? Similique nesciunt
-          molestiae dolore dolorem voluptate. Dolore assumenda tenetur harum sed
-          laboriosam officia aut, illum expedita voluptate laudantium esse,
-          alias dolores ex consectetur provident quis. Repudiandae tempora, hic
-          in esse facere, eum debitis exercitationem doloribus perferendis
-          accusantium illo odit obcaecati possimus a officia sunt harum
-          distinctio. Consequatur quod deleniti perferendis necessitatibus
-          laborum eaque modi dolorem unde iure ullam, possimus dicta
-          exercitationem aliquid error natus perspiciatis nihil sint tempora
-          saepe? Nihil incidunt, harum ipsam deserunt consectetur dolorum iure
-          nulla dignissimos alias, porro molestias repellat voluptates sint
-          laborum sapiente inventore. Numquam molestias mollitia officiis,
-          dolores ullam possimus esse totam iusto reprehenderit provident minus
-          voluptas labore eveniet repudiandae quidem accusamus, asperiores
-          voluptatum, accusantium consequuntur eum hic adipisci veniam
-          cupiditate odio. Veniam consectetur magnam nesciunt repudiandae
-          distinctio amet ab quam! Nobis recusandae provident, quasi explicabo
-          nisi cum sunt distinctio id cumque labore quos quaerat veniam corrupti
-          consectetur esse ipsum perspiciatis debitis minus rem, quia vel,
-          libero officiis. Quidem rem, non harum reiciendis nam error dolore
-          voluptas. Sunt aspernatur, excepturi commodi enim reprehenderit
-          inventore est asperiores? Consequuntur nam doloribus ipsa quaerat, cum
-          omnis dolorem consectetur, nostrum laudantium deserunt aspernatur
-          repellendus magnam ducimus officiis iusto recusandae cumque debitis
-          commodi voluptatem labore in harum quas dolorum. Consequatur sed
-          doloremque fugiat! Molestias adipisci cupiditate nihil repellat earum
-          animi quae, sed sunt reiciendis officia, sequi porro, necessitatibus
-          culpa ad! Unde repudiandae dicta ex rem eum! Consequatur iure
-          inventore qui ipsa vero, dolore in itaque ex placeat dicta possimus
-          laborum explicabo velit maiores impedit corporis magnam quos molestias
-          consectetur officiis odit quis rem alias dolorem. Illo facilis alias
-          ab sapiente quae? Quisquam architecto explicabo voluptates quidem,
-          eius fugit, dicta, ad asperiores excepturi quas modi dignissimos. At
-          nemo esse exercitationem, facilis suscipit assumenda magni recusandae
-          distinctio vitae! Neque nobis maxime officia numquam aspernatur ipsam?
-          Laboriosam nisi vitae rem natus sunt ipsa ipsum quaerat sequi? Fuga
-          laudantium ullam explicabo ipsam nihil, animi quam libero labore
-          adipisci deserunt quod. Distinctio nesciunt maiores doloremque maxime
-          officia!
-        </p>
-      </div>
+      <Conversation className="grow overflow-y-auto h-full no-scrollbar">
+        <ConversationContent>
+          {messages.map((message) => (
+            <Message key={message.id} from={message.role}>
+              <MessageContent>
+                <Response>{message.content}</Response>
+              </MessageContent>
+            </Message>
+          ))}
+        </ConversationContent>
+      </Conversation>
 
-      <form className="flex gap-2 items-center border-2 focus-within:border-neutral-800 p-3 rounded-4xl">
-        <Input
-          className="border-none outline-none focus-visible:ring-0 outline-0 shadow-none"
+      <PromptInput onSubmit={handleSend} className="mt-4 relative">
+        <PromptInputTextarea
+          onChange={(e) => {
+            setChatInput(e.target.value);
+          }}
           value={chatInput}
-          onChange={(e) => setChatInput(e.target.value)}
-          placeholder="Ask anything..."
-          onKeyDown={keyDownHandler}
         />
-        <Button className="shadow-none rounded-full size-10 text-white bg-transparent hover:bg-gray-200 transition-colors" onClick={handleSend}>
-          <Send className="text-neutral-800" size={64} />
-        </Button>
-      </form>
+        <PromptInputToolbar>
+          <PromptInputSubmit
+            className="absolute right-4 top-1/2 -translate-y-1/2"
+            disabled={false}
+            status={"ready"}
+          />
+        </PromptInputToolbar>
+      </PromptInput>
     </div>
   );
 };
